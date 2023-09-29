@@ -21,8 +21,11 @@ public class Manager : MonoBehaviour
     public Color wrongColor;
     public Color rightColor;
     public Color yellow;
+    public Color Select;
+    public Color Bg;
+    public bool Game=true;
     KeyButton[] keyButtons;
-    
+    int Unavailable=-1;
     int Index;
     int letterIndex;
     int wordIndex;
@@ -34,9 +37,11 @@ public class Manager : MonoBehaviour
         anime = Categoria[Index];
         DisplayText.text=anime;
         keyButtons = FindObjectsOfType<KeyButton>();
+        words[wordIndex].letterBg[letterIndex].color = Select;
     }
     void Update()
 {
+    if(Game==true){
     if(Input.GetKeyDown(KeyCode.Q))
     {
         SetLetter("Q");
@@ -137,11 +142,34 @@ public class Manager : MonoBehaviour
     {
         SetLetter("N");
     }
+    if(Input.GetKeyDown(KeyCode.RightArrow))
+    {
+        if(letterIndex>=4){
+            return;
+        }
+        else{
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+        letterIndex++;
+        words[wordIndex].letterBg[letterIndex].color = Select;
+    }
+    }
+    if(Input.GetKeyDown(KeyCode.LeftArrow))
+    {
+        if(letterIndex<=0){
+            return;
+        }
+        else{
+            if(letterIndex!=5){
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+            }
+        letterIndex--;
+        words[wordIndex].letterBg[letterIndex].color = Select;
+    }
+    }
     if(Input.GetKeyDown(KeyCode.M))
     {
         SetLetter("M");
     }
-
     if(Input.GetKeyDown(KeyCode.Backspace))
     {
         BackSpace();
@@ -156,50 +184,76 @@ public class Manager : MonoBehaviour
     {
         Enter();
     }
-
-    if(Input.GetKeyDown(KeyCode.Escape))
+}
+if(Input.GetKeyDown(KeyCode.Escape))
     {
         Application.Quit();
     }
 }
-
    public void SetLetter(string letter)
    {
-    if(letterIndex > 4){
+    if(Game==true ){
+    if(letterIndex >4){
         return;
     }
+    words[wordIndex].letterBg[letterIndex].color = Bg;
     words[wordIndex].letters[letterIndex].text = letter;
     letterIndex++;
+    if(letterIndex!=5){
+    words[wordIndex].letterBg[letterIndex].color = Select;
    }
-   
+   }
+   }
    public void BackSpace()
    {
+    if(Game==true){
     if(letterIndex == 0){
         return;
     }
+    words[wordIndex].letterBg[letterIndex].color = Bg;
     letterIndex--;
     words[wordIndex].letters[letterIndex].text = "";
+     words[wordIndex].letterBg[letterIndex].color = Select;
+   }
    }
    
+    public void Dica(){
+    if (Unavailable==-1){
+    int Index2=Random.Range(0,4);
+    words[wordIndex].letterBg[Index2].color = rightColor;
+    words[wordIndex].letters[Index2].text =chosenWord[Index2].ToString();
+    Unavailable=Index2;
+    }
+   }
+
    public void Enter()
    {
-    if(letterIndex <= 4)
+    if(Game==true){
+    int x=0;
+    for(int i=0; i<5;i++){
+        if(words[wordIndex].letters[i].text != ""){
+            x++;
+        }
+    }
+    if(x!=5){
         return;
+    }
     
     string newWord = chosenWord;
     char[] newWordArray = newWord.ToCharArray();
 
     List<int> rightLetters = new List<int>();
-
+    int y=0;
     for(int i=0; i<5;i++){
         if(words[wordIndex].letters[i].text ==chosenWord[i].ToString()){
             words[wordIndex].letterBg[i].color = rightColor;
             newWordArray[i]= ' ';
             rightLetters.Add(i);
             SetKeyColor(words[wordIndex].letters[i].text,rightColor, true);
+            y++;
         }
     }
-
+    
     newWord = new string(newWordArray);
     for(int i=0; i<5;i++){
         if(!rightLetters.Contains(i))
@@ -216,10 +270,16 @@ public class Manager : MonoBehaviour
             }
         }
     }
-    wordIndex++;
+    if(y==5 || wordIndex==6){
+        Game=false;
+    }
+    else{
+        wordIndex++;
     letterIndex = 0;
+    words[wordIndex].letterBg[letterIndex].color = Select;
+    }
    }
-
+   }
     void SetKeyColor(string letter,Color color, bool correct = false )
     {
         for(int i = 0; i<keyButtons.Length;i++)
