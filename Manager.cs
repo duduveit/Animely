@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class Word
@@ -16,17 +17,25 @@ public class Manager : MonoBehaviour
     public string[] Categoria;
     public string chosenWord;
     public Text DisplayText;
+    public Text Resposta;
     public string anime;
     public Word[] words;
     public Color wrongColor;
     public Color rightColor;
     public Color yellow;
     public Color Select;
+    public Color Invisible;
     public Color Bg;
     public bool Game=true;
     KeyButton[] keyButtons;
     int Unavailable=-1;
+    public static int WordLenght;
+    public GameObject TutPOP;
+    public GameObject CreditPOP;
+    public GameObject RespostaPOP;
     int Index;
+    bool booltutorial= false;
+    bool boolcredito= false;
     int letterIndex;
     int wordIndex;
     // Start is called before the first frame update
@@ -34,13 +43,24 @@ public class Manager : MonoBehaviour
     {
         Index=Random.Range(0,wordList.Length);
         chosenWord = wordList[Index];
+        TutPOP=GameObject.Find("Tutorial POP UP");
+        CreditPOP=GameObject.Find("Creditos");
+        RespostaPOP=GameObject.Find("MostrarResultado");
+        MostrarResultado();
+        Creditos();
         anime = Categoria[Index];
         DisplayText.text=anime;
+        WordLenght=chosenWord.Length;
         keyButtons = FindObjectsOfType<KeyButton>();
+        for(int i=WordLenght;i<8;i++){
+            for(int j=0 ;j<6;j++){
+            words[j].letterBg[i].color = Invisible;
+        }
+        }
         words[wordIndex].letterBg[letterIndex].color = Select;
     }
-    void Update()
-{
+
+    void Update(){
     if(Game==true){
     if(Input.GetKeyDown(KeyCode.Q))
     {
@@ -144,7 +164,7 @@ public class Manager : MonoBehaviour
     }
     if(Input.GetKeyDown(KeyCode.RightArrow))
     {
-        if(letterIndex>=4){
+        if(letterIndex>=WordLenght-1){
             return;
         }
         else{
@@ -159,7 +179,7 @@ public class Manager : MonoBehaviour
             return;
         }
         else{
-            if(letterIndex!=5){
+            if(letterIndex!=WordLenght){
         words[wordIndex].letterBg[letterIndex].color = Bg;
             }
         letterIndex--;
@@ -185,21 +205,29 @@ public class Manager : MonoBehaviour
         Enter();
     }
 }
+
+if(Game==false){
+ MostrarResultado();
+}
+
 if(Input.GetKeyDown(KeyCode.Escape))
     {
         Application.Quit();
     }
 }
+    public void Restart(){
+        SceneManager.LoadScene("teste");
+    }
    public void SetLetter(string letter)
    {
     if(Game==true ){
-    if(letterIndex >4){
+    if(letterIndex >WordLenght-1){
         return;
     }
     words[wordIndex].letterBg[letterIndex].color = Bg;
     words[wordIndex].letters[letterIndex].text = letter;
     letterIndex++;
-    if(letterIndex!=5){
+    if(letterIndex!=WordLenght){
     words[wordIndex].letterBg[letterIndex].color = Select;
    }
    }
@@ -207,35 +235,77 @@ if(Input.GetKeyDown(KeyCode.Escape))
    public void BackSpace()
    {
     if(Game==true){
-    if(letterIndex == 0){
+    if(letterIndex == -1){
+        return;
+    }
+    if(letterIndex >WordLenght-1){
         return;
     }
     words[wordIndex].letterBg[letterIndex].color = Bg;
-    letterIndex--;
     words[wordIndex].letters[letterIndex].text = "";
-     words[wordIndex].letterBg[letterIndex].color = Select;
+    if (letterIndex!=0){
+    letterIndex--;
+    }
+    words[wordIndex].letterBg[letterIndex].color = Select;
    }
    }
    
     public void Dica(){
-    if (Unavailable==-1){
-    int Index2=Random.Range(0,4);
+    if (Unavailable==-1 && Game==true){
+    int Index2=Random.Range(0,WordLenght-1);
     words[wordIndex].letterBg[Index2].color = rightColor;
     words[wordIndex].letters[Index2].text =chosenWord[Index2].ToString();
     Unavailable=Index2;
     }
    }
 
+    public void Tutorial(){
+    CreditPOP.gameObject.SetActive(false);
+    boolcredito=true;
+   if(booltutorial==false){
+    TutPOP.gameObject.SetActive(false);
+    booltutorial=true;
+   }
+   else{
+    TutPOP.gameObject.SetActive(true);
+    booltutorial=false;
+   }
+   }
+
+    public void Creditos(){
+    TutPOP.gameObject.SetActive(false);
+    booltutorial=true;
+   if(boolcredito==false){
+    CreditPOP.gameObject.SetActive(false);
+    boolcredito=true;
+   }
+   else{
+    CreditPOP.gameObject.SetActive(true);
+    boolcredito=false;
+   }
+   }
+   
+    public void MostrarResultado(){
+   if(Game==true){
+    RespostaPOP.gameObject.SetActive(false);
+   }
+   else{
+    RespostaPOP.gameObject.SetActive(true);
+    Resposta.text=chosenWord;
+   }
+   }
+
+
    public void Enter()
    {
     if(Game==true){
     int x=0;
-    for(int i=0; i<5;i++){
+    for(int i=0; i<WordLenght;i++){
         if(words[wordIndex].letters[i].text != ""){
             x++;
         }
     }
-    if(x!=5){
+    if(x!=WordLenght){
         return;
     }
     
@@ -244,7 +314,7 @@ if(Input.GetKeyDown(KeyCode.Escape))
 
     List<int> rightLetters = new List<int>();
     int y=0;
-    for(int i=0; i<5;i++){
+    for(int i=0; i<WordLenght;i++){
         if(words[wordIndex].letters[i].text ==chosenWord[i].ToString()){
             words[wordIndex].letterBg[i].color = rightColor;
             newWordArray[i]= ' ';
@@ -255,7 +325,7 @@ if(Input.GetKeyDown(KeyCode.Escape))
     }
     
     newWord = new string(newWordArray);
-    for(int i=0; i<5;i++){
+    for(int i=0; i<WordLenght;i++){
         if(!rightLetters.Contains(i))
         {
             if(newWord.Contains(words[wordIndex].letters[i].text))
@@ -270,16 +340,23 @@ if(Input.GetKeyDown(KeyCode.Escape))
             }
         }
     }
-    if(y==5 || wordIndex==6){
+    
+    if(y==WordLenght){
         Game=false;
     }
+
+    wordIndex++;
+    if(wordIndex==6){
+    Game=false;
+    }
     else{
-        wordIndex++;
+        
     letterIndex = 0;
     words[wordIndex].letterBg[letterIndex].color = Select;
     }
    }
    }
+
     void SetKeyColor(string letter,Color color, bool correct = false )
     {
         for(int i = 0; i<keyButtons.Length;i++)
