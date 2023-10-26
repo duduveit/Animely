@@ -5,7 +5,7 @@ O jogo possui dois scripts, o "KeyButtons.cs", que serve apenas para imprimir as
 
 Sobre o sistema para ler a palavra digitada, suponhamos que a palavra escolhida seja "GOHAN", ela é transformada em um array de char de tamanho = 5, sendo array[0] = "G", array[1] = "O", array[2] = "H", array[3] = "A", array[4] = "N", também será criado um novo array para armazenar a palavra que será digitada pelo jogador, que chamaremos de "array2". Ao apertar Enter, o jogo verifica se todos os espaços do array2 estão preenchidos, caso contrário, nada acontece, caso todos estejam preenchidos, ele compara os dois arrays de acordo com seus índices. Caso a letra esteja na posição correta, ou seja, array[0] == array2[0], ela ficará verde, caso exista na palavra mas em outra posição, ela ficará amarela, caso não exista na palavra, ela ficará preta. O jogo termina quando todas as letras estiverem verdes.
 
-}Atualização TG3}
+[Atualização TG3]
 Foi adicionado novas telas de pop-up, para créditos e Tutorial, explicando respectivamente que futuramente serão editados com informações corretas, atualmente ambos os pop-ups são placeholder para depois colocarmos os créditos e como jogar o jogo respectivamente.
 
 Além disso, com algumas modificações no "Manager.cs", agora ele consegue dizer quantas letras uma palavra possui e mudar o tamanho do vetor que vai conter os caracteres das letras, isso permitiu o codigo, suportar palavras de 1 a 8 letras(ainda que o minimo número de letras aceitaveis para esse jogo em especifico é 3 letras) ,ao inves do modelo anterior que somente podia ser palavras com 5, as letras que não serão usadas são desativadas e se tornam impossivel de interagir.
