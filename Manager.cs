@@ -16,6 +16,7 @@ public class Manager : MonoBehaviour
     public string[] wordList;
     public string[] Categoria;
     public string chosenWord;
+    public string wordX;
     public Text DisplayText;
     public Text Resposta;
     bool dica=true;
@@ -27,35 +28,49 @@ public class Manager : MonoBehaviour
     public Color Select;
     public Color Invisible;
     public Color Bg;
+    public Color Used;
+    public Image dicaImage;
+    public Image desisto;
     public int[] DicasP;
     public static bool Game=true;
     KeyButton[] keyButtons;
     int Unavailable=-1;
     public static int WordLenght;
     public GameObject TutPOP;
+    public GameObject Invalid;
     public GameObject CreditPOP;
     public GameObject RespostaPOP;
     public GameObject NewGame;
+    public GameObject Table;
+    public GameObject Controles;
+
     int Index;
     bool booltutorial= false;
     bool boolcredito= false;
+    bool boolcontrol=false;
     int letterIndex;
     int wordIndex;
     // Start is called before the first frame update
     void Start()
-    {
+    { 
         Game=true;
         Index=Random.Range(0,wordList.Length);
         chosenWord = wordList[Index];
         TutPOP=GameObject.Find("Tutorial POP UP");
         CreditPOP=GameObject.Find("Creditos");
         RespostaPOP=GameObject.Find("MostrarResultado");
+        Controles=GameObject.Find("Controle");
+        Invalid=GameObject.Find("Invalid");
         MostrarResultado();
         Creditos();
         NewGame.SetActive(false);
+        Invalid.SetActive(false);
+        Controles.SetActive(false);
         anime = Categoria[Index];
         DisplayText.text=anime;
         WordLenght=chosenWord.Length;
+        //int change=(8-WordLenght)*25;
+        //Table.transform.position = new Vector3(790+change, 625, 0);
         keyButtons = FindObjectsOfType<KeyButton>();
         for(int i=WordLenght;i<8;i++){
             for(int j=0 ;j<6;j++){
@@ -144,6 +159,41 @@ public class Manager : MonoBehaviour
     {
         SetLetter("L");
     }
+    if(Input.GetKeyDown(KeyCode.Delete))
+    {
+        letterIndex=WordLenght-1;
+        BackSpace();
+    }
+    if(Input.GetKeyDown(KeyCode.Minus))
+    {
+        letterIndex=WordLenght-1;
+        for(int i=0;i<WordLenght+1;i++){
+            BackSpace();
+            if(letterIndex==Unavailable){
+              if(letterIndex<=0){
+            words[wordIndex].letterBg[letterIndex].color = Bg;
+            letterIndex=WordLenght-1;
+            words[wordIndex].letterBg[letterIndex].color = Select;
+        }
+        if(letterIndex-1==Unavailable){
+            if(letterIndex<0 ||Unavailable==0){
+            }
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+        letterIndex-=2;
+        words[wordIndex].letterBg[letterIndex].color = Select;
+        }
+        else{
+            if(letterIndex!=WordLenght){
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+            }
+        letterIndex--;
+        words[wordIndex].letterBg[letterIndex].color = Select;
+    
+    }  
+            }
+    }
+
+    }
     if(Input.GetKeyDown(KeyCode.Z))
     {
         SetLetter("Z");
@@ -168,9 +218,43 @@ public class Manager : MonoBehaviour
     {
         SetLetter("N");
     }
+    if(Input.GetKeyDown(KeyCode.UpArrow))
+    {
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+        if(Unavailable==0){
+            letterIndex=1;
+        }
+        else{
+            letterIndex=0;
+        }
+        words[wordIndex].letterBg[letterIndex].color = Select;
+        return;
+    }
+    if(Input.GetKeyDown(KeyCode.DownArrow))
+    {
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+        if(Unavailable==WordLenght-1){
+            letterIndex=WordLenght-2;
+        }
+        else{
+            letterIndex=WordLenght-1;
+        }
+        words[wordIndex].letterBg[letterIndex].color = Select;
+        return;
+    }
     if(Input.GetKeyDown(KeyCode.RightArrow))
     {
         if(letterIndex>=WordLenght-1){
+            if(WordLenght-1==letterIndex){
+            words[wordIndex].letterBg[letterIndex].color = Bg;
+            }
+            if(Unavailable==0){
+            letterIndex=1;
+            words[wordIndex].letterBg[letterIndex].color = Select;
+            return;
+            }
+            letterIndex=0;
+            words[wordIndex].letterBg[letterIndex].color = Select;
             return;
         }
         if(letterIndex+1==Unavailable){
@@ -184,12 +268,50 @@ public class Manager : MonoBehaviour
         else{
         words[wordIndex].letterBg[letterIndex].color = Bg;
         letterIndex++;
+        if(letterIndex==WordLenght){
+            letterIndex=0;
+        }
+        words[wordIndex].letterBg[letterIndex].color = Select;
+    }
+    }
+     if(Input.GetKeyDown(KeyCode.Space))
+    {
+        if(letterIndex>=WordLenght-1){
+            if(WordLenght-1==letterIndex){
+            words[wordIndex].letterBg[letterIndex].color = Bg;
+            }
+            if(Unavailable==0){
+            letterIndex=1;
+            words[wordIndex].letterBg[letterIndex].color = Select;
+            return;
+            }
+            letterIndex=0;
+            words[wordIndex].letterBg[letterIndex].color = Select;
+            return;
+        }
+        if(letterIndex+1==Unavailable){
+            if(Unavailable==WordLenght-1){
+            return;
+            }
+            words[wordIndex].letterBg[letterIndex].color = Bg;
+        letterIndex+=2;
+        words[wordIndex].letterBg[letterIndex].color = Select;
+        }
+        else{
+        words[wordIndex].letterBg[letterIndex].color = Bg;
+        letterIndex++;
+        if(letterIndex==WordLenght){
+            letterIndex=0;
+        }
         words[wordIndex].letterBg[letterIndex].color = Select;
     }
     }
     if(Input.GetKeyDown(KeyCode.LeftArrow))
     {
         if(letterIndex<=0){
+            words[wordIndex].letterBg[letterIndex].color = Bg;
+            letterIndex=WordLenght-1;
+            words[wordIndex].letterBg[letterIndex].color = Select;
             return;
         }
         if(letterIndex-1==Unavailable){
@@ -230,6 +352,7 @@ public class Manager : MonoBehaviour
 
 if(Game==false){
     NewGame.SetActive(true);
+    words[wordIndex].letterBg[letterIndex].color = Bg;
  MostrarResultado();
 }
 
@@ -243,13 +366,19 @@ if(Input.GetKeyDown(KeyCode.Escape))
     }
    public void SetLetter(string letter)
    {
+    Invalid.SetActive(false);
     if(Game==true ){
     if(letterIndex >WordLenght-1){
         return;
     }
     words[wordIndex].letterBg[letterIndex].color = Bg;
     words[wordIndex].letters[letterIndex].text = letter;
+    if(letterIndex!=WordLenght-1){
     letterIndex++;
+    }
+    else{
+        letterIndex=0;
+    }
     if(letterIndex==Unavailable){
         if(Unavailable==WordLenght-1){
             return;
@@ -264,10 +393,16 @@ if(Input.GetKeyDown(KeyCode.Escape))
    public void BackSpace()
    {
     if(Game==true){
-    if(letterIndex == -1){
+        Invalid.SetActive(false);
+    if(letterIndex == -1 || letterIndex== WordLenght){
         return;
     }
-    if(letterIndex >WordLenght-1){
+    if(letterIndex >WordLenght){
+        return;
+    }
+    if (letterIndex==WordLenght){
+        letterIndex=WordLenght-1;
+        words[wordIndex].letterBg[letterIndex].color = Select;
         return;
     }
     words[wordIndex].letterBg[letterIndex].color = Bg;
@@ -281,6 +416,10 @@ if(Input.GetKeyDown(KeyCode.Escape))
         letterIndex++;
 
     }
+    }
+    if(letterIndex>WordLenght){
+    words[wordIndex].letterBg[letterIndex].color = Invisible;
+    letterIndex=WordLenght-1;
     }
     words[wordIndex].letterBg[letterIndex].color = Select;
    }
@@ -299,8 +438,10 @@ if(Input.GetKeyDown(KeyCode.Escape))
     else if (Unavailable==-1 && Game==true && dica==true){
     int Index2=Random.Range(0,WordLenght-1);
     if(DicasP[Index2]==1){
-    while(DicasP[Index2]!=0 && Index2<=WordLenght-1){
-    Index2++;
+    for(int a=0;a<WordLenght;a++){
+        if(DicasP[a]==0){
+            Index2=a;
+        }
     }
     }
     words[wordIndex].letterBg[Index2].color = rightColor;
@@ -310,14 +451,26 @@ if(Input.GetKeyDown(KeyCode.Escape))
     if(Index2==0){
         letterIndex++;
     }
+    if(letterIndex==Unavailable){
+        if(Unavailable==0){
+            letterIndex=1;
+        }
+        else{
+            letterIndex=0;
+        }
+        words[wordIndex].letterBg[letterIndex].color = Select;
+    }
     dica=false;
+    dicaImage.color=Used;
     }
    }
 
     public void Tutorial(){
     if(Game==true){
     CreditPOP.gameObject.SetActive(false);
+    Controles.gameObject.SetActive(false);
     boolcredito=true;
+    boolcontrol=true;
    if(booltutorial==false){
     TutPOP.gameObject.SetActive(false);
     booltutorial=true;
@@ -329,10 +482,40 @@ if(Input.GetKeyDown(KeyCode.Escape))
    }
     }
 
+    public void Control(){
+    if(Game==true){
+    CreditPOP.gameObject.SetActive(false);
+    TutPOP.gameObject.SetActive(false);
+    boolcredito=true;
+   if(boolcontrol==false){
+    Controles.gameObject.SetActive(false);
+    boolcontrol=true;
+   }
+   else{
+    Controles.gameObject.SetActive(true);
+    boolcontrol=false;
+   }
+   }
+    }
+
+
+    public void GiveUp(){
+        if(Game!=false){
+            desisto.color=Used;
+        Game=false;
+        Invalid.gameObject.SetActive(false);
+        Estatisticas.GamesPlayed++;
+        Estatisticas.Streak=0;
+        Estatisticas.Answers[7]++;
+    }
+    }
+
     public void Creditos(){
     if(Game==true){
     TutPOP.gameObject.SetActive(false);
+    Controles.gameObject.SetActive(false);
     booltutorial=true;
+    boolcontrol=true;
    if(boolcredito==false){
     CreditPOP.gameObject.SetActive(false);
     boolcredito=true;
@@ -343,6 +526,8 @@ if(Input.GetKeyDown(KeyCode.Escape))
    }
     }
    }
+
+   
    
     public void MostrarResultado(){
    if(Game==true){
@@ -354,7 +539,25 @@ if(Input.GetKeyDown(KeyCode.Escape))
    }
    }
 
-
+    public bool VerifyWord(){
+        for (int j=0;j<wordList.Length;j++){
+            wordX= wordList[j];
+            int size=wordX.Length;
+            int V=0;
+            int X=0;
+        for(int i=0; i<size;i++){
+        if(words[wordIndex].letters[i].text ==wordX[i].ToString()){
+            V++;
+        }
+        X++;
+        }
+        
+        if(V==size && X==WordLenght){
+            return false;
+        }
+        }
+        return true;
+    }
    public void Enter()
    {
     if(Game==true){
@@ -367,7 +570,11 @@ if(Input.GetKeyDown(KeyCode.Escape))
     if(x!=WordLenght){
         return;
     }
-    
+    if(VerifyWord()){
+        Invalid.SetActive(true);
+        return;
+    }
+    Invalid.SetActive(false);
     string newWord = chosenWord;
     char[] newWordArray = newWord.ToCharArray();
 
@@ -415,6 +622,7 @@ if(Input.GetKeyDown(KeyCode.Escape))
     Game=false;
     Estatisticas.GamesPlayed++;
     Estatisticas.Streak=0;
+    Estatisticas.Answers[7]++;
     }
     else{
         
